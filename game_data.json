@@ -1,0 +1,509 @@
+{
+    "5596656149": {
+        "username": "ARTIN",
+        "level": 3,
+        "title": "پاسدار",
+        "gold": 7494,
+        "exp": 28,
+        "exp_needed": 144,
+        "army": "byzantine",
+        "army_join_time": "2026-06-16T13:15:01.174513",
+        "inventory": [
+            "dagger"
+        ],
+        "current_weapon": "dagger",
+        "current_armor": null,
+        "current_horse": null,
+        "last_fight": "2026-06-16T16:34:44.300879",
+        "fight_blocked_until": null,
+        "wins": 10,
+        "losses": 1,
+        "last_attack": null,
+        "daily_quests": [
+            {
+                "name": "حمله‌کننده",
+                "desc": "۱ بار حمله کن",
+                "type": "attack",
+                "target": 1,
+                "progress": 1,
+                "completed": true,
+                "gold": 400,
+                "exp": 25,
+                "claimed": true
+            },
+            {
+                "name": "بازرگان",
+                "desc": "۱ آیتم بخر",
+                "type": "buy",
+                "target": 1,
+                "progress": 1,
+                "completed": true,
+                "gold": 200,
+                "exp": 15,
+                "claimed": true
+            },
+            {
+                "name": "سرباز حرفه‌ای",
+                "desc": "۳ بار در جنگ پیروز شو",
+                "type": "win_fight",
+                "target": 3,
+                "progress": 3,
+                "completed": true,
+                "gold": 800,
+                "exp": 50,
+                "claimed": true
+            }
+        ],
+        "last_daily": "2026-06-16"
+    },
+    "7131115513": {
+        "username": "Ali",
+        "level": 1,
+        "title": "رعیت",
+        "gold": 2484,
+        "exp": 76,
+        "exp_needed": 100,
+        "army": "persian",
+        "army_join_time": "2026-06-16T13:17:44.079637",
+        "inventory": [],
+        "current_weapon": null,
+        "current_armor": null,
+        "current_horse": null,
+        "wins": 3,
+        "losses": 1,
+        "daily_quests": [
+            {
+                "name": "جنگجو",
+                "desc": "۲ بار در جنگ پیروز شو",
+                "type": "win_fight",
+                "target": 2,
+                "progress": 2,
+                "completed": true,
+                "gold": 500,
+                "exp": 30
+            },
+            {
+                "name": "قاتل",
+                "desc": "۵ بار در جنگ پیروز شو",
+                "type": "win_fight",
+                "target": 5,
+                "progress": 3,
+                "completed": false,
+                "gold": 1500,
+                "exp": 80
+            },
+            {
+                "name": "حمله‌کننده",
+                "desc": "۱ بار حمله کن",
+                "type": "attack",
+                "target": 1,
+                "progress": 0,
+                "completed": false,
+                "gold": 400,
+                "exp": 25
+            }
+        ],
+        "last_daily": "2026-06-16",
+        "last_attack": null,
+        "last_fight": "2026-06-16T16:25:49.322416",
+        "fight_blocked_until": "2026-06-16T16:35:49.322441"
+    },
+    "6178703946": {
+        "username": "شهروز",
+        "level": 1,
+        "title": "رعیت",
+        "gold": 1916,
+        "exp": 20,
+        "exp_needed": 100,
+        "army": "holy_roman",
+        "army_join_time": "2026-06-16T16:05:08.148705",
+        "inventory": [],
+        "current_weapon": null,
+        "current_armor": null,
+        "current_horse": null,
+        "wins": 2,
+        "losses": 0,
+        "daily_quests": [
+            {
+                "name": "قاتل",
+                "desc": "۵ بار در جنگ پیروز شو",
+                "type": "win_fight",
+                "target": 5,
+                "progress": 1,
+                "completed": false,
+                "gold": 1500,
+                "exp": 80
+            },
+            {
+                "name": "غارتگر",
+                "desc": "۲ بار حمله کن",
+                "type": "attack",
+                "target": 2,
+                "progress": 0,
+                "completed": false,
+                "gold": 700,
+                "exp": 45
+            },
+            {
+                "name": "بازرگان",
+                "desc": "۱ آیتم بخر",
+                "type": "buy",
+                "target": 1,
+                "progress": 0,
+                "completed": false,
+                "gold": 200,
+                "exp": 15
+            }
+        ],
+        "last_daily": "2026-06-16",
+        "last_attack": null,
+        "last_fight": "2026-06-16T16:16:22.318290",
+        "fight_blocked_until": null
+    },
+    "6578393261": {
+        "username": "khodafucker",
+        "level": 1,
+        "title": "رعیت",
+        "gold": 2651,
+        "exp": 65,
+        "exp_needed": 100,
+        "army": "persian",
+        "army_join_time": "2026-06-16T13:15:16.946129",
+        "inventory": [
+            "iron_sword"
+        ],
+        "current_weapon": "iron_sword",
+        "current_armor": null,
+        "current_horse": null,
+        "wins": 4,
+        "losses": 1,
+        "daily_quests": [
+            {
+                "name": "بازرگان",
+                "desc": "۱ آیتم بخر",
+                "type": "buy",
+                "target": 1,
+                "progress": 1,
+                "completed": true,
+                "gold": 1000,
+                "exp": 110
+            },
+            {
+                "name": "سرباز حرفه‌ای",
+                "desc": "۳ بار در جنگ پیروز شو",
+                "type": "win_fight",
+                "target": 3,
+                "progress": 1,
+                "completed": false,
+                "gold": 2500,
+                "exp": 160
+            },
+            {
+                "name": "حمله‌کننده",
+                "desc": "۱ بار حمله کن",
+                "type": "attack",
+                "target": 1,
+                "progress": 0,
+                "completed": false,
+                "gold": 2100,
+                "exp": 200
+            }
+        ],
+        "last_daily": "2026-06-16",
+        "last_attack": null,
+        "last_fight": "2026-06-16T16:26:12.904667",
+        "fight_blocked_until": null
+    },
+    "6707897196": {
+        "username": "Nito",
+        "level": 2,
+        "title": "سرباز",
+        "gold": 4100,
+        "exp": 59,
+        "exp_needed": 120,
+        "army": "holy_roman",
+        "army_join_time": "2026-06-16T13:15:15.616546",
+        "inventory": [
+            "steel_sword"
+        ],
+        "current_weapon": "steel_sword",
+        "current_armor": null,
+        "current_horse": null,
+        "wins": 7,
+        "losses": 0,
+        "daily_quests": [
+            {
+                "name": "بازرگان",
+                "desc": "۱ آیتم بخر",
+                "type": "buy",
+                "target": 1,
+                "progress": 1,
+                "completed": true,
+                "gold": 200,
+                "exp": 15,
+                "claimed": true
+            },
+            {
+                "name": "قاتل",
+                "desc": "۵ بار در جنگ پیروز شو",
+                "type": "win_fight",
+                "target": 5,
+                "progress": 5,
+                "completed": true,
+                "gold": 1500,
+                "exp": 80
+            },
+            {
+                "name": "جنگجو",
+                "desc": "۲ بار در جنگ پیروز شو",
+                "type": "win_fight",
+                "target": 2,
+                "progress": 2,
+                "completed": true,
+                "gold": 500,
+                "exp": 30,
+                "claimed": true
+            }
+        ],
+        "last_daily": "2026-06-16",
+        "last_attack": null,
+        "last_fight": "2026-06-16T16:16:38.496732",
+        "fight_blocked_until": null
+    },
+    "7242899938": {
+        "username": "bandibokonsami",
+        "level": 1,
+        "title": "رعیت",
+        "gold": 710,
+        "exp": 15,
+        "exp_needed": 100,
+        "army": "holy_roman",
+        "army_join_time": "2026-06-16T13:27:06.220971",
+        "inventory": [],
+        "current_weapon": null,
+        "current_armor": null,
+        "current_horse": null,
+        "wins": 1,
+        "losses": 3,
+        "daily_quests": [
+            {
+                "name": "جنگجو",
+                "desc": "۲ بار در جنگ پیروز شو",
+                "type": "win_fight",
+                "target": 2,
+                "progress": 1,
+                "completed": false,
+                "gold": 500,
+                "exp": 30
+            },
+            {
+                "name": "سرباز حرفه‌ای",
+                "desc": "۳ بار در جنگ پیروز شو",
+                "type": "win_fight",
+                "target": 3,
+                "progress": 1,
+                "completed": false,
+                "gold": 800,
+                "exp": 50
+            },
+            {
+                "name": "حمله‌کننده",
+                "desc": "۱ بار حمله کن",
+                "type": "attack",
+                "target": 1,
+                "progress": 0,
+                "completed": false,
+                "gold": 400,
+                "exp": 25
+            }
+        ],
+        "last_daily": "2026-06-16",
+        "last_attack": null,
+        "last_fight": "2026-06-16T15:38:45.819833",
+        "fight_blocked_until": null
+    },
+    "5579458432": {
+        "username": "Gehrman",
+        "level": 2,
+        "title": "سرباز",
+        "gold": 1845,
+        "exp": 45,
+        "exp_needed": 120,
+        "army": "byzantine",
+        "army_join_time": "2026-06-16T13:26:40.387623",
+        "inventory": [
+            "studded_armor",
+            "dagger"
+        ],
+        "current_weapon": "dagger",
+        "current_armor": "studded_armor",
+        "current_horse": null,
+        "wins": 2,
+        "losses": 0,
+        "daily_quests": [
+            {
+                "name": "سرباز حرفه‌ای",
+                "desc": "۳ بار در جنگ پیروز شو",
+                "type": "win_fight",
+                "target": 3,
+                "progress": 1,
+                "completed": false,
+                "gold": 2500,
+                "exp": 160
+            },
+            {
+                "name": "بازرگان",
+                "desc": "۱ آیتم بخر",
+                "type": "buy",
+                "target": 1,
+                "progress": 1,
+                "completed": true,
+                "gold": 1000,
+                "exp": 110,
+                "claimed": true
+            },
+            {
+                "name": "جنگجو",
+                "desc": "۲ بار در جنگ پیروز شو",
+                "type": "win_fight",
+                "target": 2,
+                "progress": 1,
+                "completed": false,
+                "gold": 2000,
+                "exp": 100
+            }
+        ],
+        "last_daily": "2026-06-16",
+        "last_attack": null,
+        "last_fight": "2026-06-16T15:28:40.683937",
+        "fight_blocked_until": null
+    },
+    "5921607950": {
+        "username": "sirod",
+        "level": 1,
+        "title": "رعیت",
+        "gold": 3400,
+        "exp": 23,
+        "exp_needed": 100,
+        "army": "holy_roman",
+        "army_join_time": "2026-06-16T13:28:31.606179",
+        "inventory": [],
+        "current_weapon": null,
+        "current_armor": null,
+        "current_horse": null,
+        "wins": 2,
+        "losses": 0,
+        "daily_quests": [
+            {
+                "name": "حمله‌کننده",
+                "desc": "۱ بار حمله کن",
+                "type": "attack",
+                "target": 1,
+                "progress": 0,
+                "completed": false,
+                "gold": 2100,
+                "exp": 200
+            },
+            {
+                "name": "سرباز حرفه‌ای",
+                "desc": "۳ بار در جنگ پیروز شو",
+                "type": "win_fight",
+                "target": 3,
+                "progress": 1,
+                "completed": false,
+                "gold": 2500,
+                "exp": 160
+            },
+            {
+                "name": "جنگجو",
+                "desc": "۲ بار در جنگ پیروز شو",
+                "type": "win_fight",
+                "target": 2,
+                "progress": 1,
+                "completed": false,
+                "gold": 2000,
+                "exp": 100
+            }
+        ],
+        "last_daily": "2026-06-16",
+        "last_attack": null,
+        "last_fight": "2026-06-16T16:12:52.778098",
+        "fight_blocked_until": null
+    },
+    "7721651764": {
+        "username": "wesker",
+        "level": 1,
+        "title": "رعیت",
+        "gold": 500,
+        "exp": 0,
+        "exp_needed": 100,
+        "army": "persian",
+        "army_join_time": "2026-06-16T15:28:54.897241",
+        "inventory": [],
+        "current_weapon": null,
+        "current_armor": null,
+        "current_horse": null,
+        "wins": 0,
+        "losses": 0,
+        "daily_quests": [],
+        "last_daily": null,
+        "last_attack": null,
+        "last_fight": "2026-06-16T15:29:07.101096",
+        "fight_blocked_until": "2026-06-16T15:59:07.101114"
+    },
+    "5514338095": {
+        "username": "Pouria",
+        "level": 2,
+        "title": "سرباز",
+        "gold": 800,
+        "exp": 13,
+        "exp_needed": 120,
+        "army": "persian",
+        "army_join_time": "2026-06-16T16:03:00.247351",
+        "inventory": [
+            "iron_sword",
+            "leather_armor"
+        ],
+        "current_weapon": null,
+        "current_armor": null,
+        "current_horse": null,
+        "wins": 4,
+        "losses": 0,
+        "daily_quests": [
+            {
+                "name": "سرباز حرفه‌ای",
+                "desc": "۳ بار در جنگ پیروز شو",
+                "type": "win_fight",
+                "target": 3,
+                "progress": 1,
+                "completed": false,
+                "gold": 2500,
+                "exp": 160
+            },
+            {
+                "name": "غارتگر",
+                "desc": "۲ بار حمله کن",
+                "type": "attack",
+                "target": 2,
+                "progress": 0,
+                "completed": false,
+                "gold": 1200,
+                "exp": 170
+            },
+            {
+                "name": "بازرگان",
+                "desc": "۱ آیتم بخر",
+                "type": "buy",
+                "target": 1,
+                "progress": 1,
+                "completed": true,
+                "gold": 1000,
+                "exp": 110
+            }
+        ],
+        "last_daily": "2026-06-16",
+        "last_attack": null,
+        "last_fight": "2026-06-16T16:19:29.800467",
+        "fight_blocked_until": "2026-06-16T16:29:29.800486"
+    }
+}
