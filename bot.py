@@ -1401,6 +1401,99 @@ async def rename(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 
+# ========== بکاپ ==========
+async def backup(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """گرفتن بکاپ از دیتا و ارسال به ادمین"""
+    if update.effective_user.id != ADMIN_ID:
+        await update.message.reply_text("❌ فقط ادمین!")
+        return
+    
+    data = load_data()
+    if not data:
+        await update.message.reply_text("❌ دیتایی وجود ندارد!")
+        return
+    
+    # ذخیره موقت
+    with open("backup.json", "w", encoding="utf-8") as f:
+        json.dump(data, f, indent=4, ensure_ascii=False)
+    
+    # ارسال فایل به ادمین
+    try:
+        with open("backup.json", "rb") as f:
+            await update.message.reply_document(
+                document=f, 
+                filename=f"backup_{datetime.now().strftime('%Y-%m-%d_%H-%M')}.json",
+                caption=f"📅 بکاپ گرفته شده در {datetime.now().strftime('%Y-%m-%d %H:%M')}"
+            )
+        await update.message.reply_text("✅ بکاپ با موفقیت گرفته شد!")
+    except Exception as e:
+        await update.message.reply_text(f"❌ خطا در ارسال بکاپ: {e}")
+    finally:
+        if os.path.exists("backup.json"):
+            os.remove("backup.json")
+
+
+async def restore(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """بازگرداندن دیتا از فایل بکاپ (با ریپلای روی فایل)"""
+    if update.effective_user.id != ADMIN_ID:
+        await update.message.reply_text("❌ فقط ادمین!")
+        return
+    
+    # چک کردن اینکه کاربر روی فایل ریپلای کرده
+    if not update.message.reply_to_message:
+        await update.message.reply_text("❌ لطفاً روی فایل بکاپ ریپلای کن!")
+        return
+    
+    if not update.message.reply_to_message.document:
+        await update.message.reply_text("❌ لطفاً روی فایل بکاپ ریپلای کن!")
+        return
+    
+    # گرفتن فایل
+    doc = update.message.reply_to_message.document
+    if not doc.file_name.endswith(".json"):
+        await update.message.reply_text("❌ فایل باید با فرمت JSON باشد!")
+        return
+    
+    await update.message.reply_text("⏳ در حال بازیابی دیتا...")
+    
+    try:
+        # دانلود فایل
+        file = await context.bot.get_file(doc.file_id)
+        file_path = "restore_temp.json"
+        await file.download_to_drive(file_path)
+        
+        # خوندن فایل
+        with open(file_path, "r", encoding="utf-8") as f:
+            data = json.load(f)
+        
+        if not data or not isinstance(data, dict):
+            await update.message.reply_text("❌ فایل معتبر نیست!")
+            return
+        
+        # ذخیره دیتا
+        save_data(data)
+        
+        # تعداد کاربران
+        user_count = len(data)
+        await update.message.reply_text(
+            f"✅ دیتا با موفقیت بازیابی شد!\n\n"
+            f"👥 تعداد کاربران: {user_count}\n"
+            f"📅 تاریخ بازیابی: {datetime.now().strftime('%Y-%m-%d %H:%M')}"
+        )
+        
+    except json.JSONDecodeError:
+        await update.message.reply_text("❌ فایل JSON معتبر نیست!")
+    except Exception as e:
+        await update.message.reply_text(f"❌ خطا در بازیابی: {e}")
+    finally:
+        if os.path.exists("restore_temp.json"):
+            os.remove("restore_temp.json")
+
+        
+
+
+
+
 # ========== کامندهای فارسی ==========
 async def handle_farsi_commands(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """تشخیص کامندهای فارسی بدون نیاز به /"""
@@ -1475,6 +1568,10 @@ def main():
     app.add_handler(CommandHandler("admin", admin_panel))
     app.add_handler(CommandHandler("duel", duel))
     app.add_handler(CommandHandler("rename", rename))
+    app.add_handler(CommandHandler("backup", backup))
+    app.add_handler(CommandHandler("restore", restore))
+
+
     
     # ========== 2. کالبک‌ها (CallbackQueryHandler) ==========
     app.add_handler(CallbackQueryHandler(army_callback, pattern="^army_"))
