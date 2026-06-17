@@ -210,18 +210,58 @@ async def register(update: Update, context: ContextTypes.DEFAULT_TYPE):
     waiting_for_name[uid] = True
     await update.message.reply_text("✨ یه اسم برای شخصیتت انتخاب کن:\n• حداکثر ۱۵ حرف\n• فقط حروف انگلیسی و اعداد")
 
+
+
 async def handle_name(update: Update, context: ContextTypes.DEFAULT_TYPE):
     uid = update.effective_user.id
     if uid not in waiting_for_name:
         return
+    
     text = update.message.text.strip()
-    if len(text) > 15 or " " in text or not text.replace("_", "").isalnum():
-        await update.message.reply_text("❌ اسم نامعتبر. دوباره تلاش کن:")
+    
+    # ====== ثبت‌نام در پیوی ======
+    if update.message.chat.type == "private":
+        # چک کردن اسم
+        if len(text) > 15 or " " in text or not text.replace("_", "").isalnum():
+            await update.message.reply_text("❌ اسم نامعتبر. دوباره تلاش کن (حداکثر ۱۵ حرف، فقط حروف انگلیسی و اعداد):")
+            return
+        
+        existing_id, _ = get_user_by_username(text)
+        if existing_id:
+            await update.message.reply_text("❌ این اسم قبلاً ثبت شده!")
+            return
+        
+        data = load_data()
+        data[str(uid)] = init_user({
+            "username": text, "level": 1, "title": "رعیت", "gold": 500,
+            "exp": 0, "exp_needed": 100, "army": None, "army_join_time": None
+        })
+        save_data(data)
+        del waiting_for_name[uid]
+        await update.message.reply_text(f"✅ ثبت‌نام موفق!\n🎭 نام: {text}\n💰 طلا: 500\n🌟 لول: 1")
         return
+    
+    # ====== ثبت‌نام در گروه ======
+    # چک کردن ریپلی
+    if not update.message.reply_to_message:
+        await update.message.reply_text("❌ لطفاً روی پیام بات ریپلی کن و اسم رو بفرست.")
+        return
+    
+    bot_user = await context.bot.get_me()
+    if update.message.reply_to_message.from_user.id != bot_user.id:
+        await update.message.reply_text("❌ لطفاً روی پیام بات ریپلی کن، نه پیام شخص دیگه.")
+        return
+    
+    # چک کردن اسم
+    if len(text) > 15 or " " in text or not text.replace("_", "").isalnum():
+        await update.message.reply_text("❌ اسم نامعتبر. دوباره تلاش کن (حداکثر ۱۵ حرف، فقط حروف انگلیسی و اعداد):")
+        return
+    
     existing_id, _ = get_user_by_username(text)
     if existing_id:
         await update.message.reply_text("❌ این اسم قبلاً ثبت شده!")
         return
+    
     data = load_data()
     data[str(uid)] = init_user({
         "username": text, "level": 1, "title": "رعیت", "gold": 500,
@@ -230,6 +270,7 @@ async def handle_name(update: Update, context: ContextTypes.DEFAULT_TYPE):
     save_data(data)
     del waiting_for_name[uid]
     await update.message.reply_text(f"✅ ثبت‌نام موفق!\n🎭 نام: {text}\n💰 طلا: 500\n🌟 لول: 1")
+
 
 async def profile(update: Update, context: ContextTypes.DEFAULT_TYPE):
     uid = str(update.effective_user.id)
@@ -655,70 +696,61 @@ async def auto_close_fight_menu(context: ContextTypes.DEFAULT_TYPE):
     except Exception as e:
         print(f"خطا در auto_close_fight_menu: {e}")
 
+            
 async def fight_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """پردازش نتیجه جنگ با قفل"""
     q = update.callback_query
     await q.answer()
     
     uid = str(q.from_user.id)
     
-    # چک کردن اینکه این منو هنوز فعال هست
-    if uid in user_fight_menu:
-        if q.message.message_id != user_fight_menu[uid]:
-            await q.edit_message_text("⏳ این منو منقضی شده! لطفاً دوباره /solofight بزن.")
-            return
-        # پاک کردن منو از لیست تا دوباره استفاده نشه
-        del user_fight_menu[uid]
+    # ====== چک کردن صاحب پنل ======
+    # اگه کاربر در user_fight_menu نیست، یعنی پنل مال اونه
+    if uid not in user_fight_menu:
+        await q.edit_message_text("❌ این پنل مال شما نیست!")
+        return
+    
+    # اگه message_id مطابقت نداره
+    if q.message.message_id != user_fight_menu[uid]:
+        await q.edit_message_text("❌ این پنل منقضی شده یا مال شما نیست!")
+        return
+    
+    # پاک کردن منو از لیست تا دوباره استفاده نشه
+    del user_fight_menu[uid]
     
     # چک کردن قفل جنگ
     if uid in fight_lock and fight_lock[uid]:
         await q.edit_message_text("⏳ درخواست جنگ قبلی هنوز در حال پردازش است!")
         return
     
-    # قفل کردن جنگ برای این کاربر
     fight_lock[uid] = True
     
     try:
-        ft = int(q.data[6:])  # استخراج عدد از "fight_1" → 1
-        
+        ft = int(q.data[6:])
         fights = {
             1: {"name": "کمک کارگری", "reward": 500, "base_risk": 0},
             2: {"name": "فتح روستا", "reward": 1200, "base_risk": 25},
             3: {"name": "جبهه فرعی", "reward": 1700, "base_risk": 50},
             4: {"name": "جبهه اصلی", "reward": 2300, "base_risk": 80}
         }
-        
         fight = fights[ft]
-        
         data = load_data()
         if uid not in data:
             await q.edit_message_text("❌ خطا! کاربر پیدا نشد.")
             return
-        
         user = init_user(data[uid])
-        
-        # محاسبه قدرت کل
         total_bonus = get_total_effect(user) + get_army_bonus(user)
         final_risk = max(5, min(95, fight["base_risk"] - total_bonus))
-        
-        # تاس انداختن
         roll = randint(1, 100)
         win = roll > final_risk
-        
-        # ثبت زمان آخرین جنگ
         user["last_fight"] = datetime.now().isoformat()
         
         if win:
-            # ====== پیروزی ======
             reward = fight["reward"]
             exp_gain = randint(10, 30)
-            
             user["gold"] += reward
             user["exp"] += exp_gain
             user["wins"] += 1
             user["fight_blocked_until"] = None
-            
-            # چک کردن لول آپ
             leveled = False
             while user["exp"] >= user["exp_needed"]:
                 user["exp"] -= user["exp_needed"]
@@ -726,8 +758,6 @@ async def fight_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 user["exp_needed"] = int(user["exp_needed"] * 1.2)
                 user["title"] = get_title(user["level"])
                 leveled = True
-            
-            # آپدیت کوئست روزانه
             today = datetime.now().date().isoformat()
             if user.get("last_daily") == today:
                 for quest in user.get("daily_quests", []):
@@ -735,46 +765,22 @@ async def fight_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
                         quest["progress"] = quest.get("progress", 0) + 1
                         if quest["progress"] >= quest["target"]:
                             quest["completed"] = True
-            
             save_data(data)
-            
-            # ساخت پیام نتیجه
-            msg = f"🎉 **پیروزی در {fight['name']}!** 🎉\n\n"
-            msg += f"💰 +{reward} سکه\n"
-            msg += f"✨ +{exp_gain} تجربه\n"
-            msg += f"🎲 شانس شکست: {final_risk}%\n"
-            
+            msg = f"🎉 **پیروزی در {fight['name']}!** 🎉\n\n💰 +{reward} سکه\n✨ +{exp_gain} تجربه\n🎲 شانس شکست: {final_risk}%"
             if leveled:
-                msg += f"\n🌟 **لول آپ!**\n"
-                msg += f"🏅 لول: {user['level']}\n"
-                msg += f"🎭 لقب جدید: {user['title']}"
-            
+                msg += f"\n\n🌟 **لول آپ!**\n🏅 لول: {user['level']}\n🎭 لقب جدید: {user['title']}"
             await q.edit_message_text(msg)
-            
         else:
-            # ====== شکست ======
             user["fight_blocked_until"] = (datetime.now() + timedelta(minutes=FIGHT_BLOCK_MINUTES)).isoformat()
             save_data(data)
-            
-            await q.edit_message_text(
-                f"💀 **شکست در {fight['name']}!** 💀\n\n"
-                f"⏳ تا {FIGHT_BLOCK_MINUTES} دقیقه نمی‌تونی بجنگی.\n"
-                f"🎲 شانس شکست: {final_risk}%\n"
-                f"🎲 عدد تاس: {roll}\n\n"
-                "بعد از بهبودی دوباره /solofight بزن."
-            )
-    
+            await q.edit_message_text(f"💀 **شکست در {fight['name']}!** 💀\n\n⏳ تا {FIGHT_BLOCK_MINUTES} دقیقه نمی‌تونی بجنگی.\n🎲 شانس شکست: {final_risk}%\n🎲 عدد تاس: {roll}\n\nبعد از بهبودی دوباره /solofight بزن.")
     except ValueError:
         await q.edit_message_text("❌ خطا در پردازش درخواست!")
-    
     except Exception as e:
         print(f"خطا در fight_callback: {e}")
         await q.edit_message_text("❌ خطایی رخ داد! دوباره تلاش کن.")
-    
     finally:
-        # باز کردن قفل (حتماً اجرا می‌شه)
-        fight_lock[uid] = False
-
+        fight_lock[uid] = False            
 
 
 # ========== حمله ==========
@@ -1298,58 +1304,91 @@ async def duel_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await query.edit_message_text(result_text, parse_mode="Markdown")
         
     elif action.startswith("duel_cancel_"):
-        duel_id = action.replace("duel_cancel_", "")
+
+
         
+
+async def duel_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    query = update.callback_query
+    await query.answer()
+    
+    user_id = str(query.from_user.id)
+    data = load_data()
+    
+    if user_id not in data:
+        await query.edit_message_text("❌ اول با /register ثبت‌نام کن!")
+        return
+    
+    user = init_user(data[user_id])
+    action = query.data
+    
+    if action.startswith("duel_join_"):
+        duel_id = action.replace("duel_join_", "")
         if duel_id not in active_duels:
             await query.edit_message_text("❌ این دوئل منقضی شده یا وجود ندارد!")
             return
+        duel = active_duels[duel_id]
+        if duel["status"] != "waiting":
+            await query.edit_message_text("❌ این دوئل قبلاً شروع شده یا تمام شده!")
+            return
+        if duel["creator_id"] == user_id:
+            await query.edit_message_text("❌ نمی‌تونی با خودت دوئل کنی!")
+            return
+        if user["gold"] < duel["bet_amount"]:
+            await query.edit_message_text(f"❌ طلای کافی نداری! نیاز به {duel['bet_amount']} سکه داری!")
+            # لغو خودکار دوئل اگه کسی نتونه بپیونده
+            return
         
+        duel["joiner_id"] = user_id
+        duel["joiner_name"] = user["username"]
+        duel["status"] = "started"
+        creator = init_user(data[duel["creator_id"]])
+        creator["gold"] -= duel["bet_amount"]
+        user["gold"] -= duel["bet_amount"]
+        save_data(data)
+        import random
+        winner_id = random.choice([duel["creator_id"], duel["joiner_id"]])
+        total_prize = duel["bet_amount"] * 2
+        if winner_id == duel["creator_id"]:
+            winner_name = duel["creator_name"]
+            creator["gold"] += total_prize
+        else:
+            winner_name = duel["joiner_name"]
+            user["gold"] += total_prize
+        save_data(data)
+        duel["status"] = "finished"
+        del active_duels[duel_id]
+        result_text = (
+            f"⚔️ **نتیجه دوئل!** ⚔️\n\n"
+            f"🎭 {duel['creator_name']} vs {duel['joiner_name']}\n"
+            f"💰 شرط هرکدام: {duel['bet_amount']} سکه\n"
+            f"🏆 جایزه نهایی: {total_prize} سکه\n\n"
+            f"🎉 **برنده: {winner_name}** 🎉\n\n"
+            f"💰 {winner_name} {total_prize} سکه برنده شد!"
+        )
+        await query.edit_message_text(result_text, parse_mode="Markdown")
+        
+    elif action.startswith("duel_cancel_"):
+        duel_id = action.replace("duel_cancel_", "")
+        if duel_id not in active_duels:
+            await query.edit_message_text("❌ این دوئل منقضی شده یا وجود ندارد!")
+            return
         duel = active_duels[duel_id]
         
-        # فقط سازنده دوئل می‌تونه لغو کنه
+        # ====== فقط سازنده می‌تونه لغو کنه ======
         if duel["creator_id"] != user_id:
             await query.edit_message_text("❌ فقط کسی که دوئل رو ساخته می‌تونه لغوش کنه!")
             return
-        
         if duel["status"] != "waiting":
             await query.edit_message_text("❌ این دوئل قبلاً شروع شده و قابل لغو نیست!")
             return
-        
         del active_duels[duel_id]
-        
-        # پاک کردن حالت از admin_temp_data
         if user_id in admin_temp_data:
             del admin_temp_data[user_id]
-        
         await query.edit_message_text(f"❌ دوئل توسط {duel['creator_name']} لغو شد!")
 
-async def expire_duel(context: ContextTypes.DEFAULT_TYPE):
-    """انقضای دوئل بعد از ۲ دقیقه"""
-    job_data = context.job.data
-    duel_id = job_data["duel_id"]
-    chat_id = job_data["chat_id"]
-    
-    if duel_id in active_duels:
-        duel = active_duels[duel_id]
+
         
-        if duel["status"] == "waiting":
-            # لغو خودکار دوئل
-            del active_duels[duel_id]
-            
-            # پاک کردن حالت از admin_temp_data
-            if duel["creator_id"] in admin_temp_data:
-                del admin_temp_data[duel["creator_id"]]
-            
-            try:
-                await context.bot.send_message(
-                    chat_id=chat_id,
-                    text=f"⏳ دوئل {duel['creator_name']} به دلیل عدم حضور حریف لغو شد!"
-                )
-            except:
-                pass
-
-
-
 
 # ========== تغییر اسم ==========
 async def rename(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -1492,17 +1531,23 @@ async def restore(update: Update, context: ContextTypes.DEFAULT_TYPE):
         
 
 
-
-
-# ========== کامندهای فارسی ==========
+ # ========== کامندهای فارسی ==========
 async def handle_farsi_commands(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """تشخیص کامندهای فارسی بدون نیاز به /"""
+    """تشخیص کامندهای فارسی در پیوی و گروه"""
     user_id = str(update.effective_user.id)
     text = update.message.text.strip()
+    chat_type = update.message.chat.type
     
     # فقط اگه پیام با / شروع نشده باشه
     if text.startswith("/"):
         return
+    
+    # در گروه، اگه بات ادمین هست و Privacy Mode خاموشه، همه پیام‌ها رو می‌بینه
+    # پس دیگه نیازی به چک کردن ریپلی و منشن نیست!
+    if chat_type != "private":
+        # چک کردن اینکه بات اجازه دیدن پیام‌ها رو داره
+        # این کار رو خود تلگرام انجام میده، ما فقط مطمئن میشیم
+        pass
     
     # تشخیص کامندهای فارسی
     farsi_commands = {
@@ -1542,6 +1587,8 @@ async def handle_farsi_commands(update: Update, context: ContextTypes.DEFAULT_TY
             elif english == "claim":
                 await claim(update, context)
             return
+
+
 
 
 
