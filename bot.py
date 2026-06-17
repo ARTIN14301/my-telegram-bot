@@ -1,5 +1,6 @@
 import json
 import os
+import threading
 from random import randint, sample
 from datetime import datetime, timedelta
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
@@ -12,6 +13,7 @@ FIGHT_COOLDOWN_MINUTES = 5
 FIGHT_BLOCK_MINUTES = 10
 ARMY_COOLDOWN_HOURS = 48
 ATTACK_COOLDOWN_SECONDS = 10800  # 3 ساعت
+data_lock = threading.Lock()
 
 # ========== ارتش‌ها ==========
 ARMIES_CONFIG = {
@@ -113,23 +115,25 @@ QUESTS_LIST = [
 
 # ========== توابع کمکی ==========
 def load_data():
-    if not os.path.exists(DATA_FILE):
-        return {}
-    try:
-        with open(DATA_FILE, "r", encoding="utf-8") as f:
-            content = f.read().strip()
-            if not content:
-                return {}
-            return json.loads(content)
-    except:
-        return {}
+    with data_lock:
+        if not os.path.exists(DATA_FILE):
+            return {}
+        try:
+            with open(DATA_FILE, "r", encoding="utf-8") as f:
+                content = f.read().strip()
+                if not content:
+                    return {}
+                return json.loads(content)
+        except:
+            return {}
 
 def save_data(data):
-    try:
-        with open(DATA_FILE, "w", encoding="utf-8") as f:
-            json.dump(data, f, indent=4, ensure_ascii=False)
-    except:
-        pass
+    with data_lock:
+        try:
+            with open(DATA_FILE, "w", encoding="utf-8") as f:
+                json.dump(data, f, indent=4, ensure_ascii=False)
+        except:
+            pass
 
 def get_title(level):
     if level < 1: return TITLES[0]
@@ -163,15 +167,21 @@ def paginate(items, page, per_page=5):
 def init_user(user):
     """اطمینان از وجود همه فیلدهای مورد نیاز"""
     defaults = {
-        "inventory": [], "current_weapon": None, "current_armor": None, "current_horse": None,
-        "wins": 0, "losses": 0, "daily_quests": [], "last_daily": None, "last_attack": None
+        "inventory": [], 
+        "current_weapon": None, 
+        "current_armor": None, 
+        "current_horse": None,
+        "wins": 0, 
+        "losses": 0, 
+        "daily_quests": [], 
+        "last_daily": None, 
+        "last_attack": None
     }
     for key, val in defaults.items():
         if key not in user:
             user[key] = val
     return user
 
-waiting_for_name = {}
 
 def get_user_by_username(username):
     data = load_data()
@@ -513,20 +523,38 @@ async def show_inv_items(q, uid, data, item_type, page):
     keyboard.append([InlineKeyboardButton("🔙", callback_data="inv_back")])
     await q.edit_message_text(text, reply_markup=InlineKeyboardMarkup(keyboard))
 
+
+
 async def equip_item(q, uid, item_key, data):
     user = init_user(data[uid])
     if item_key not in user["inventory"]:
-        await q.edit_message_text("❌ در اینونتوری نیست!")
+        await q.edit_message_text("❌ این آیتم در اینونتوری نیست!")
         return
+    
     item = ITEMS[item_key]
-    if item["type"] == "weapon":
+    item_type = item["type"]
+    
+    if item_type == "weapon":
+        if user.get("current_weapon") == item_key:
+            await q.edit_message_text("❌ این سلاح قبلاً تجهیز شده!")
+            return
         user["current_weapon"] = item_key
-    elif item["type"] == "armor":
+        
+    elif item_type == "armor":
+        if user.get("current_armor") == item_key:
+            await q.edit_message_text("❌ این زره قبلاً تجهیز شده!")
+            return
         user["current_armor"] = item_key
-    elif item["type"] == "horse":
+        
+    elif item_type == "horse":
+        if user.get("current_horse") == item_key:
+            await q.edit_message_text("❌ این اسب قبلاً تجهیز شده!")
+            return
         user["current_horse"] = item_key
+        
     save_data(data)
     await q.edit_message_text(f"✅ {item['name']} تجهیز شد!")
+
 
 async def inv_back(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await inventory(update, context)
@@ -1373,6 +1401,56 @@ async def rename(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 
+# ========== کامندهای فارسی ==========
+async def handle_farsi_commands(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """تشخیص کامندهای فارسی بدون نیاز به /"""
+    user_id = str(update.effective_user.id)
+    text = update.message.text.strip()
+    
+    # فقط اگه پیام با / شروع نشده باشه
+    if text.startswith("/"):
+        return
+    
+    # تشخیص کامندهای فارسی
+    farsi_commands = {
+        "دوئل": "duel",
+        "پروفایل": "profile",
+        "ثبت نام": "register",
+        "ثبت‌نام": "register",
+        "جنگ": "solofight",
+        "حمله": "attack",
+        "خرید": "shop",
+        "اینونتوری": "inventory",
+        "رنکینگ": "top",
+        "کوئست": "daily",
+        "گرفتن": "claim"
+    }
+    
+    for farsi, english in farsi_commands.items():
+        if text == farsi:
+            if english == "duel":
+                await duel(update, context)
+            elif english == "profile":
+                await profile(update, context)
+            elif english == "register":
+                await register(update, context)
+            elif english == "solofight":
+                await solofight(update, context)
+            elif english == "attack":
+                await attack(update, context)
+            elif english == "shop":
+                await shop(update, context)
+            elif english == "inventory":
+                await inventory(update, context)
+            elif english == "top":
+                await top(update, context)
+            elif english == "daily":
+                await daily(update, context)
+            elif english == "claim":
+                await claim(update, context)
+            return
+
+
 
 
 # ========== اجرا ==========
@@ -1406,6 +1484,10 @@ def main():
     app.add_handler(CallbackQueryHandler(top_callback, pattern="^top_"))
     app.add_handler(CallbackQueryHandler(admin_callback, pattern="^admin_"))
     app.add_handler(CallbackQueryHandler(duel_callback, pattern="^duel_"))
+
+       
+    # ========== هندلر کامندهای فارسی (بدون /) ==========
+    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_farsi_commands))
     
     # ========== 3. هندلرهای متنی (MessageHandler) با اولویت ==========
     # اولویت 1: دوئل (عدد شرط)
